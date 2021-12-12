@@ -45,6 +45,17 @@ const LeftEyes = styled.div`
   background-color: black;
   border-radius: 50%;
 `
+const FaceMouth = styled.div`
+  position: relative;
+  top: 8px;
+  left: 13px;
+  width: 20px;
+  height: 10px;
+  overflow: hidden; /* はみ出す部分を非表示にする */
+  border: solid 2px black;
+  border-top: 0;
+  border-radius: 0 0 100px 100px;
+`
 
 const BlockArea = styled.div`
   position: relative;
@@ -70,6 +81,7 @@ const Home: NextPage = () => {
         <Face>
           <RightEyes></RightEyes>
           <LeftEyes></LeftEyes>
+          <FaceMouth></FaceMouth>
         </Face>
         <BlockArea>
           <Block></Block>
