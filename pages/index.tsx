@@ -1,9 +1,12 @@
 import type { NextPage } from 'next'
+import { useState } from 'react'
 import styled from 'styled-components'
+
+const FONT_COLORS = ['blue', 'green', 'red', 'purple', 'brown', 'orange', 'yellow', 'pink']
 
 const Container = styled.div`
   height: 800px;
-  background-color: blue;
+  background-color: #4796fd;
 `
 const Board = styled.div`
   position: absolute;
@@ -27,7 +30,7 @@ const Face = styled.div`
   border: solid 2px;
   border-radius: 50%; /* 角丸 */
 `
-const RightEyes = styled.div`
+const RightEye = styled.div`
   position: relative;
   top: 13px;
   left: 9px;
@@ -36,7 +39,7 @@ const RightEyes = styled.div`
   background-color: black;
   border-radius: 50%;
 `
-const LeftEyes = styled.div`
+const LeftEye = styled.div`
   position: relative;
   top: 2px;
   left: 26px;
@@ -51,7 +54,6 @@ const FaceMouth = styled.div`
   left: 13px;
   width: 20px;
   height: 10px;
-  overflow: hidden; /* はみ出す部分を非表示にする */
   border: solid 2px black;
   border-top: 0;
   border-radius: 0 0 100px 100px;
@@ -65,36 +67,81 @@ const BlockArea = styled.div`
   margin: auto;
   background-color: gray;
 `
-const Block = styled.div`
+const Block = styled.div<{ isOpen: boolean; num: number }>`
   float: left;
   width: 34px;
   height: 34px;
+  font-size: 30px;
+  font-weight: bold;
+  line-height: 30px;
+  color: ${(props) => (props.num >= 1 && props.num <= 8 ? FONT_COLORS[props.num - 1] : 'black')};
+  text-align: center;
   vertical-align: baseline;
-  background-color: #ccc;
-  border: solid 1px;
+  background: ${(props) => (props.isOpen ? 'white' : 'gray')};
+  border: solid 1px black;
 `
-
+const BombBlock = styled.div`
+  float: left;
+  width: 34px;
+  height: 34px;
+  font-size: 25px;
+  line-height: 30px;
+  color: red;
+  text-align: center;
+  vertical-align: baseline;
+  background: white;
+  border: solid 1px black;
+`
 const Home: NextPage = () => {
+  // prettier -ignore
+  const [board, setBoard] = useState([
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    [9, 9, 9, 9, 9, 9, 9, 9, 9],
+  ])
+
+  const [bombs, setBombs] = useState([{ x: 0, y: 0 }])
+
+  const onClick = (x: number, y: number) => {
+    console.log(x, y)
+    const newBoard: number[][] = JSON.parse(JSON.stringify(board))
+    // newBoard[y][x] = 1
+    let existBomb = false
+    for (let i = 0; i < bombs.length; i++) {
+      if (bombs[i].x === x && bombs[i].y === y) {
+        existBomb = true
+      }
+    }
+    newBoard[y][x] = existBomb ? 10 : 1
+
+    setBoard(newBoard)
+  }
   return (
     <Container>
       <Board>
         <Face>
-          <RightEyes></RightEyes>
-          <LeftEyes></LeftEyes>
+          <RightEye></RightEye>
+          <LeftEye></LeftEye>
           <FaceMouth></FaceMouth>
         </Face>
         <BlockArea>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
-          <Block></Block>
+          {board.map((row, y) =>
+            row.map((num, x) =>
+              num === 10 ? (
+                <BombBlock key={`${x}-${y}`}>●</BombBlock>
+              ) : (
+                <Block key={`${x}-${y}`} isOpen={num < 9} num={num} onClick={() => onClick(x, y)}>
+                  {num > 0 && num < 9 && num}
+                </Block>
+              )
+            )
+          )}
         </BlockArea>
       </Board>
     </Container>

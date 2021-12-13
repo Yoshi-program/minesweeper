@@ -19,5 +19,5 @@ jobs:
           key: client-npm-${{ hashFiles('yarn.lock') }}
       - run: npm install
         if: steps.client-npm-cache.outputs.cache-hit != 'true'
-      - run: npm run lint
+      # - run: npm run lint
       - run: npm run typecheck
