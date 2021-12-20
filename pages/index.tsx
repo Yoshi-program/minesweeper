@@ -106,19 +106,51 @@ const Home: NextPage = () => {
     [9, 9, 9, 9, 9, 9, 9, 9, 9],
   ])
 
-  const [bombs, setBombs] = useState([{ x: 0, y: 0 }])
+  const tmpBombs: { x: number; y: number }[] = []
+  // const tmpBombs = []
+  let i = 0
+  while (i < 10) {
+    const numx = Math.floor(Math.random() * 9)
+    const numy = Math.floor(Math.random() * 9)
+
+    if (!tmpBombs.some((value) => value === { x: numx, y: numy })) {
+      tmpBombs.push({ x: numx, y: numy })
+      i++
+    }
+  }
+  console.log(tmpBombs)
+  const [bombs, setBombs] = useState(tmpBombs)
 
   const onClick = (x: number, y: number) => {
     console.log(x, y)
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
-    // newBoard[y][x] = 1
+    // newBoard[y][x] = 2
     let existBomb = false
+
+    let NumBombs = 0
+
+    for (let i = 0; i < bombs.length; i++) {
+      for (const n of [x + 1, x, x - 1]) {
+        for (const j of [y + 1, y, y - 1]) {
+          if (n == x && j == y) {
+            continue
+          }
+          if (bombs[i].x === n && bombs[i].y === j) {
+            existBomb = true
+            if (existBomb) {
+              NumBombs += 1
+            }
+            existBomb = false
+          }
+        }
+      }
+    }
     for (let i = 0; i < bombs.length; i++) {
       if (bombs[i].x === x && bombs[i].y === y) {
         existBomb = true
       }
     }
-    newBoard[y][x] = existBomb ? 10 : 1
+    newBoard[y][x] = existBomb ? 10 : NumBombs
 
     setBoard(newBoard)
   }
