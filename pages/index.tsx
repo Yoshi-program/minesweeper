@@ -15,6 +15,7 @@ const Board = styled.div`
   width: 400px;
   height: 400px;
   margin: 0;
+
   margin-right: -50%;
   background: yellow;
   background-color: white;
@@ -110,12 +111,16 @@ const Home: NextPage = () => {
   // const tmpBombs = []
   let i = 0
   while (i < 10) {
-    const numx = Math.floor(Math.random() * 9)
-    const numy = Math.floor(Math.random() * 9)
+    const numx = Math.floor(Math.random() * 4)
+    const numy = Math.floor(Math.random() * 4)
 
     if (!tmpBombs.some((value) => value === { x: numx, y: numy })) {
-      tmpBombs.push({ x: numx, y: numy })
-      i++
+      if (tmpBombs.indexOf({ x: numx, y: numy }) === -1) {
+        tmpBombs.push({ x: numx, y: numy })
+        i++
+      }
+      // tmpBombs.push({ x: numx, y: numy })
+      // i++
     }
   }
   console.log(tmpBombs)
@@ -151,6 +156,36 @@ const Home: NextPage = () => {
       }
     }
     newBoard[y][x] = existBomb ? 10 : NumBombs
+
+    /*if (NumBombs === 0) {
+      for (const xz of [x + 1, x, x - 1]) {
+        for (const yz of [y + 1, y, y - 1]) {
+          NumBombs = 0
+          if (xz == x && yz == y) {
+            continue
+          }
+          for (let i = 0; i < bombs.length; i++) {
+            for (const xzz of [xz + 1, xz, xz - 1]) {
+              for (const yzz of [yz + 1, yz, yz - 1]) {
+                if (xzz == xz && yzz == yz) {
+                  continue
+                }
+                if (bombs[i].x === xzz && bombs[i].y === yzz) {
+                  existBomb = true
+                  if (existBomb) {
+                    NumBombs += 1
+                  }
+                  existBomb = false
+                  if (NumBombs === 0) {
+                    newBoard[yz][xz] = NumBombs
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }*/
 
     setBoard(newBoard)
   }
