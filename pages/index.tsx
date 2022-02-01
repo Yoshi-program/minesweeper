@@ -6,7 +6,7 @@ const FONT_COLORS = ['blue', 'green', 'red', 'purple', 'brown', 'orange', 'yello
 
 const Container = styled.div`
   height: 800px;
-  background-color: #4796fd;
+  background-color: #62a6ff;
 `
 const Board = styled.div`
   position: absolute;
@@ -232,7 +232,7 @@ const Home: NextPage = () => {
 
     // 白連鎖のための周りの座標を保存し返す関数
     const ListofAround = (x: number, y: number) => {
-      let CoordinateList = []
+      const CoordinateList = []
       for (const cx of [x + 1, x, x - 1]) {
         for (const cy of [y + 1, y, y - 1]) {
           if (0 <= cx && cx < 9 && 0 <= cy && cy < 9 && { x: x, y: y } !== { x: cx, y: cy }) {
