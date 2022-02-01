@@ -12,18 +12,66 @@ const Board = styled.div`
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 400px;
-  height: 400px;
+  width: 430px;
+  height: 488px;
   margin: 0;
-
   margin-right: -50%;
   background: yellow;
-  background-color: white;
+  background-color: #e3e3e3;
   transform: translate(-50%, -50%);
+  border-top: solid 5px #ffffff;
+  border-left: solid 5px #ffffff;
+  border-right: solid 5px #3e3e3e;
+  border-bottom: solid 5px #3e3e3e;
 `
+const AboveBlock = styled.div`
+  position: relative;
+  top: 10px;
+  width: 378px;
+  height: 77px;
+  margin: auto;
+  background-color: #b0b0b0;
+  border-top: solid 5px #3e3e3e;
+  border-left: solid 5px #3e3e3e;
+  border-right: solid 5px #ffffff;
+  border-bottom: solid 5px #ffffff;
+`
+const NumBombsBlock = styled.div`
+  position: absolute;
+  top: 8px;
+  right: 250px;
+  width: 100px;
+  height: 50px;
+  margin: auto;
+  background-color: #1b1b1b;
+  color: red;
+  font-size: 43px;
+  text-align: center;
+  border-top: solid 2px #d4d4d4;
+  border-left: solid 2px #d4d4d4;
+  border-right: solid 2px #3e3e3e;
+  border-bottom: solid 2px #3e3e3e;
+`
+const TimerBlock = styled.div`
+  position: absolute;
+  top: 8px;
+  right: 25px;
+  width: 100px;
+  height: 50px;
+  margin: auto;
+  background-color: #1b1b1b;
+  color: red;
+  font-size: 43px;
+  text-align: center;
+  border-top: solid 2px #d4d4d4;
+  border-left: solid 2px #d4d4d4;
+  border-right: solid 2px #3e3e3e;
+  border-bottom: solid 2px #3e3e3e;
+`
+
 const Face = styled.div`
   position: relative;
-  top: 15px;
+  top: 8px;
   width: 50px; /* 幅 */
   height: 50px; /* 高さ */
   margin: auto;
@@ -59,39 +107,54 @@ const FaceMouth = styled.div`
   border-top: 0;
   border-radius: 0 0 100px 100px;
 `
-
+const AroundBlockArea = styled.div`
+  position: absolute;
+  top: 95px;
+  right: 20px;
+  width: 378px;
+  height: 378px;
+  margin: auto;
+  background-color: #b0b0b0;
+  border-top: solid 5px #3e3e3e;
+  border-left: solid 5px #3e3e3e;
+  border-right: solid 5px #ffffff;
+  border-bottom: solid 5px #ffffff;
+`
 const BlockArea = styled.div`
   position: relative;
-  top: 30px;
-  width: 306px;
-  height: 306px;
+  top: 0px;
+  width: 369px;
+  height: 369px;
   margin: auto;
-  background-color: gray;
+  background-color: #b0b0b0;
 `
 const Block = styled.div<{ isOpen: boolean; num: number }>`
   float: left;
-  width: 34px;
-  height: 34px;
+  width: 41px;
+  height: 41px;
   font-size: 30px;
   font-weight: bold;
   line-height: 30px;
   color: ${(props) => (props.num >= 1 && props.num <= 8 ? FONT_COLORS[props.num - 1] : 'black')};
   text-align: center;
   vertical-align: baseline;
-  background: ${(props) => (props.isOpen ? 'white' : 'gray')};
-  border: solid 1px black;
+  background: ${(props) => (props.isOpen ? '#e5e5e5' : '#959595')};
+  border-top: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #d4d4d4')};
+  border-left: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #d4d4d4')};
+  border-right: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #3e3e3e')};
+  border-bottom: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #3e3e3e')};
 `
 const BombBlock = styled.div`
   float: left;
-  width: 34px;
-  height: 34px;
+  width: 41px;
+  height: 41px;
   font-size: 25px;
   line-height: 30px;
   color: red;
   text-align: center;
   vertical-align: baseline;
-  background: white;
-  border: solid 1px black;
+  background: #e5e5e5;
+  border: solid 1px #707070;
 `
 const Home: NextPage = () => {
   // prettier -ignore
@@ -208,9 +271,6 @@ const Home: NextPage = () => {
       }
     }
     // 白連鎖
-    const ListofNewCoordinate = []
-    let SecondNumBombs = 0
-    let SeocndListofNewCoordinate = []
     if (NumBombs === 0) {
       let NewNumBombs = 0
       const Coordinate = ListofAround(x, y)
@@ -224,72 +284,36 @@ const Home: NextPage = () => {
               Coordinate.push({ x: nc.x, y: nc.y })
             }
         }
-        /*for (const nc of ListofNewCoordinate) {
-          NewNumBombs = CountBombs(nc.x, nc.y)
-          if (NewNumBombs === 0) {
-            ListofNewCoordinate.push({ x: nc.x, y: nc.y })
-            newBoard[nc.y][nc.x] = NewNumBombs
-          }
-        }*/
       }
     }
 
     newBoard[y][x] = existBomb ? 10 : NumBombs
-
-    /*if (NumBombs === 0) {
-      for (const xz of [x + 1, x, x - 1]) {
-        for (const yz of [y + 1, y, y - 1]) {
-          NumBombs = 0
-          if (xz == x && yz == y) {
-            continue
-          }
-          for (let i = 0; i < bombs.length; i++) {
-            for (const xzz of [xz + 1, xz, xz - 1]) {
-              for (const yzz of [yz + 1, yz, yz - 1]) {
-                if (xzz == xz && yzz == yz) {
-                  continue
-                }
-                if (bombs[i].x === xzz && bombs[i].y === yzz) {
-                  existBomb = true
-                  if (existBomb) {
-                    NumBombs += 1
-                  }
-                  existBomb = false
-                  if (NumBombs === 0) {
-                    newBoard[yz][xz] = NumBombs
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }*/
 
     setBoard(newBoard)
   }
   return (
     <Container>
       <Board>
-        <Face>
-          <RightEye></RightEye>
-          <LeftEye></LeftEye>
-          <FaceMouth></FaceMouth>
-        </Face>
-        <div>count={count}</div>
-        <BlockArea>
-          {board.map((row, y) =>
-            row.map((num, x) =>
-              num === 10 ? (
-                <BombBlock key={`${x}-${y}`}>●</BombBlock>
-              ) : (
-                <Block key={`${x}-${y}`} isOpen={num < 9} num={num} onClick={() => onClick(x, y)}>
-                  {num > 0 && num < 9 && num}
-                </Block>
+        <AboveBlock>
+          <NumBombsBlock>0{bombs.length}</NumBombsBlock>
+          <Face></Face>
+          <TimerBlock>{count}</TimerBlock>
+        </AboveBlock>
+        <AroundBlockArea>
+          <BlockArea>
+            {board.map((row, y) =>
+              row.map((num, x) =>
+                num === 10 ? (
+                  <BombBlock key={`${x}-${y}`}>●</BombBlock>
+                ) : (
+                  <Block key={`${x}-${y}`} isOpen={num < 9} num={num} onClick={() => onClick(x, y)}>
+                    {num > 0 && num < 9 && num}
+                  </Block>
+                )
               )
-            )
-          )}
-        </BlockArea>
+            )}
+          </BlockArea>
+        </AroundBlockArea>
       </Board>
     </Container>
   )
