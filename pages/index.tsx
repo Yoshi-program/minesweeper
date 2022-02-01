@@ -107,27 +107,69 @@ const Home: NextPage = () => {
     [9, 9, 9, 9, 9, 9, 9, 9, 9],
   ])
 
+  // 爆弾の生成
   const tmpBombs: { x: number; y: number }[] = []
-  // const tmpBombs = []
-  let i = 0
-  while (i < 10) {
-    const numx = Math.floor(Math.random() * 4)
-    const numy = Math.floor(Math.random() * 4)
+  let NumofBombs = 0
+  while (NumofBombs < 10) {
+    const numx = Math.floor(Math.random() * 9)
+    const numy = Math.floor(Math.random() * 9)
 
     if (!tmpBombs.some((value) => value === { x: numx, y: numy })) {
-      if (tmpBombs.indexOf({ x: numx, y: numy }) === -1) {
+      if (!tmpBombs.some((bomb) => bomb.x === numx && bomb.y === numy)) {
         tmpBombs.push({ x: numx, y: numy })
-        i++
+        NumofBombs++
       }
+      /*if (!tmpBombs.some((value) => value === { x: numx, y: numy })) {
+      tmpBombs.push({ x: numx, y: numy })
+      NumofBombs++*/
+
       // tmpBombs.push({ x: numx, y: numy })
       // i++
     }
   }
+  //-----------
   console.log(tmpBombs)
   const [bombs, setBombs] = useState(tmpBombs)
 
   const onClick = (x: number, y: number) => {
     console.log(x, y)
+
+    // 周りの爆弾を数える関数
+    const CountBombs = (x: number, y: number) => {
+      let existBomb = false
+      let NumBombs = 0
+      for (let i = 0; i < bombs.length; i++) {
+        for (const n of [x + 1, x, x - 1]) {
+          for (const j of [y + 1, y, y - 1]) {
+            if (n == x && j == y) {
+              continue
+            }
+            if (bombs[i].x === n && bombs[i].y === j) {
+              existBomb = true
+              if (existBomb) {
+                NumBombs += 1
+              }
+              existBomb = false
+            }
+          }
+        }
+      }
+      return NumBombs
+    }
+
+    // 白連鎖のための周りの座標を保存し返す関数
+    const ListofAround = (x: number, y: number) => {
+      let CoordinateList = []
+      for (const cx of [x + 1, x, x - 1]) {
+        for (const cy of [y + 1, y, y - 1]) {
+          if (0 <= cx && cx < 9 && 0 <= cy && cy < 9 && { x: x, y: y } !== { x: cx, y: cy }) {
+            CoordinateList.push({ x: cx, y: cy })
+          }
+        }
+      }
+      return CoordinateList
+    }
+
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
     // newBoard[y][x] = 2
     let existBomb = false
@@ -155,6 +197,33 @@ const Home: NextPage = () => {
         existBomb = true
       }
     }
+    // 白連鎖
+    const ListofNewCoordinate = []
+    let SecondNumBombs = 0
+    let SeocndListofNewCoordinate = []
+    if (NumBombs === 0) {
+      let NewNumBombs = 0
+      const Coordinate = ListofAround(x, y)
+      for (const c of Coordinate) {
+        NewNumBombs = CountBombs(c.x, c.y)
+        newBoard[c.y][c.x] = NewNumBombs
+
+        if (NewNumBombs === 0) {
+          for (const nc of ListofAround(c.x, c.y))
+            if (!Coordinate.some((nb) => nb.x === nc.x && nb.y === nc.y)) {
+              Coordinate.push({ x: nc.x, y: nc.y })
+            }
+        }
+        /*for (const nc of ListofNewCoordinate) {
+          NewNumBombs = CountBombs(nc.x, nc.y)
+          if (NewNumBombs === 0) {
+            ListofNewCoordinate.push({ x: nc.x, y: nc.y })
+            newBoard[nc.y][nc.x] = NewNumBombs
+          }
+        }*/
+      }
+    }
+
     newBoard[y][x] = existBomb ? 10 : NumBombs
 
     /*if (NumBombs === 0) {
