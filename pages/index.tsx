@@ -6,7 +6,7 @@ const FONT_COLORS = ['blue', 'green', 'red', 'purple', 'brown', 'orange', 'yello
 
 const Container = styled.div`
   height: 800px;
-  background-color: #62a6ff;
+  background-color: #549cfb;
 `
 const Board = styled.div`
   position: absolute;
