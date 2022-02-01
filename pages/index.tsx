@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 const FONT_COLORS = ['blue', 'green', 'red', 'purple', 'brown', 'orange', 'yellow', 'pink']
@@ -106,6 +106,16 @@ const Home: NextPage = () => {
     [9, 9, 9, 9, 9, 9, 9, 9, 9],
     [9, 9, 9, 9, 9, 9, 9, 9, 9],
   ])
+
+  // タイマー関数
+
+  const [count, setCount] = useState(0)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount((c) => c + 1)
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [])
 
   // 爆弾の生成
   const tmpBombs: { x: number; y: number }[] = []
@@ -266,6 +276,7 @@ const Home: NextPage = () => {
           <LeftEye></LeftEye>
           <FaceMouth></FaceMouth>
         </Face>
+        <div>count={count}</div>
         <BlockArea>
           {board.map((row, y) =>
             row.map((num, x) =>
