@@ -118,15 +118,6 @@ const Block = styled.div<{ isOpen: boolean; num: number }>`
   border-right: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #3e3e3e')};
   border-bottom: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #3e3e3e')};
 `
-const EmptyBlock = styled.div`
-  float: left;
-  width: 41px;
-  height: 41px;
-  line-height: 30px;
-  vertical-align: baseline;
-  background-color: #b0b0b0;
-  border: solid 1px #707070;
-`
 const BombBlock = styled.div`
   float: left;
   width: 41px;
@@ -141,8 +132,8 @@ const BombBlock = styled.div`
   border: solid 1px #707070;
 `
 const Home: NextPage = () => {
-  let GameClear = false
-  let GameOver = false
+  // let GameClear = false
+  // let GameOver = false
 
   // prettier -ignore
   const [board, setBoard] = useState([
@@ -241,12 +232,12 @@ const Home: NextPage = () => {
       }
     }
 
-    if (existBomb) {
+    /*if (existBomb) {
       GameOver = true
       for (const bomb of tmpBombs) {
         // newBoard[bomb.y][bomb.x] = 10
       }
-    }
+    }*/
 
     // 白連鎖
     if (NumBombs === 0) {
