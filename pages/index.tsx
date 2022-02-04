@@ -2,7 +2,7 @@ import type { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
-const FONT_COLORS = ['blue', 'green', 'red', 'purple', 'brown', 'orange', 'yellow', 'pink']
+const imageUrl = 'img/minesweeper.png'
 
 const Container = styled.div`
   height: 800px;
@@ -72,40 +72,15 @@ const TimerBlock = styled.div`
 const Face = styled.div`
   position: relative;
   top: 8px;
-  width: 50px; /* 幅 */
-  height: 50px; /* 高さ */
+  width: 50px;
+  height: 50px;
   margin: auto;
-  background-color: #ffcd8c;
-  border: solid 2px;
-  border-radius: 50%; /* 角丸 */
-`
-const RightEye = styled.div`
-  position: relative;
-  top: 13px;
-  left: 9px;
-  width: 11px;
-  height: 11px;
-  background-color: black;
-  border-radius: 50%;
-`
-const LeftEye = styled.div`
-  position: relative;
-  top: 2px;
-  left: 26px;
-  width: 11px;
-  height: 11px;
-  background-color: black;
-  border-radius: 50%;
-`
-const FaceMouth = styled.div`
-  position: relative;
-  top: 8px;
-  left: 13px;
-  width: 20px;
-  height: 10px;
-  border: solid 2px black;
-  border-top: 0;
-  border-radius: 0 0 100px 100px;
+  background-color: #b0b0b0;
+  background-image: url(${imageUrl});
+  background-size: 525px;
+  background-position: 113px 0px;
+  border: solid 5px;
+  border-color: #d4d4d4 #3e3e3e #3e3e3e #d4d4d4;
 `
 const AroundBlockArea = styled.div`
   position: absolute;
@@ -132,31 +107,43 @@ const Block = styled.div<{ isOpen: boolean; num: number }>`
   float: left;
   width: 41px;
   height: 41px;
-  font-size: 30px;
-  font-weight: bold;
   line-height: 30px;
-  color: ${(props) => (props.num >= 1 && props.num <= 8 ? FONT_COLORS[props.num - 1] : 'black')};
-  text-align: center;
   vertical-align: baseline;
-  background: ${(props) => (props.isOpen ? '#e5e5e5' : '#959595')};
-  border-top: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #d4d4d4')};
+  background-image: url(${imageUrl});
+  background-size: 500px;
+  background-position: ${(props) => (props.num - 1) * -36}px 0px;
+  background-repeat: no-repeat;
+  border-top: ${(props) => (props.isOpen ? 'solid 1px #272424' : 'solid 3px #d4d4d4')};
   border-left: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #d4d4d4')};
   border-right: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #3e3e3e')};
   border-bottom: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #3e3e3e')};
+`
+const EmptyBlock = styled.div`
+  float: left;
+  width: 41px;
+  height: 41px;
+  line-height: 30px;
+  vertical-align: baseline;
+  background-color: #b0b0b0;
+  border: solid 1px #707070;
 `
 const BombBlock = styled.div`
   float: left;
   width: 41px;
   height: 41px;
-  font-size: 25px;
   line-height: 30px;
-  color: red;
-  text-align: center;
   vertical-align: baseline;
   background: #e5e5e5;
+  background-image: url(${imageUrl});
+  background-size: 515px;
+  background-position: -366px 1px;
+  background-color: #b0b0b0;
   border: solid 1px #707070;
 `
 const Home: NextPage = () => {
+  let GameClear = false
+  let GameOver = false
+
   // prettier -ignore
   const [board, setBoard] = useState([
     [9, 9, 9, 9, 9, 9, 9, 9, 9],
@@ -209,7 +196,7 @@ const Home: NextPage = () => {
 
     // 周りの爆弾を数える関数
     const CountBombs = (x: number, y: number) => {
-      let existBomb = false
+      let ExistBomb = false
       let NumBombs = 0
       for (let i = 0; i < bombs.length; i++) {
         for (const n of [x + 1, x, x - 1]) {
@@ -218,11 +205,11 @@ const Home: NextPage = () => {
               continue
             }
             if (bombs[i].x === n && bombs[i].y === j) {
-              existBomb = true
-              if (existBomb) {
+              ExistBomb = true
+              if (ExistBomb) {
                 NumBombs += 1
               }
-              existBomb = false
+              ExistBomb = false
             }
           }
         }
@@ -244,32 +231,23 @@ const Home: NextPage = () => {
     }
 
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
-    // newBoard[y][x] = 2
+
     let existBomb = false
-
     let NumBombs = 0
-
-    for (let i = 0; i < bombs.length; i++) {
-      for (const n of [x + 1, x, x - 1]) {
-        for (const j of [y + 1, y, y - 1]) {
-          if (n == x && j == y) {
-            continue
-          }
-          if (bombs[i].x === n && bombs[i].y === j) {
-            existBomb = true
-            if (existBomb) {
-              NumBombs += 1
-            }
-            existBomb = false
-          }
-        }
-      }
-    }
+    NumBombs = CountBombs(x, y)
     for (let i = 0; i < bombs.length; i++) {
       if (bombs[i].x === x && bombs[i].y === y) {
         existBomb = true
       }
     }
+
+    if (existBomb) {
+      GameOver = true
+      for (const bomb of tmpBombs) {
+        // newBoard[bomb.y][bomb.x] = 10
+      }
+    }
+
     // 白連鎖
     if (NumBombs === 0) {
       let NewNumBombs = 0
@@ -291,12 +269,28 @@ const Home: NextPage = () => {
 
     setBoard(newBoard)
   }
+  const NewGame = () => {
+    setBoard([
+      [9, 9, 9, 9, 9, 9, 9, 9, 9],
+      [9, 9, 9, 9, 9, 9, 9, 9, 9],
+      [9, 9, 9, 9, 9, 9, 9, 9, 9],
+      [9, 9, 9, 9, 9, 9, 9, 9, 9],
+      [9, 9, 9, 9, 9, 9, 9, 9, 9],
+      [9, 9, 9, 9, 9, 9, 9, 9, 9],
+      [9, 9, 9, 9, 9, 9, 9, 9, 9],
+      [9, 9, 9, 9, 9, 9, 9, 9, 9],
+      [9, 9, 9, 9, 9, 9, 9, 9, 9],
+    ])
+    setBombs(tmpBombs)
+    setCount(0)
+  }
+
   return (
     <Container>
       <Board>
         <AboveBlock>
           <NumBombsBlock>0{bombs.length}</NumBombsBlock>
-          <Face></Face>
+          <Face onClick={() => NewGame()}></Face>
           <TimerBlock>{count}</TimerBlock>
         </AboveBlock>
         <AroundBlockArea>
@@ -304,11 +298,14 @@ const Home: NextPage = () => {
             {board.map((row, y) =>
               row.map((num, x) =>
                 num === 10 ? (
-                  <BombBlock key={`${x}-${y}`}>●</BombBlock>
+                  <BombBlock key={`${x}-${y}`}></BombBlock>
                 ) : (
-                  <Block key={`${x}-${y}`} isOpen={num < 9} num={num} onClick={() => onClick(x, y)}>
-                    {num > 0 && num < 9 && num}
-                  </Block>
+                  <Block
+                    key={`${x}-${y}`}
+                    isOpen={num < 9}
+                    num={1 <= num && num <= 8 ? num : 20}
+                    onClick={() => onClick(x, y)}
+                  ></Block>
                 )
               )
             )}
