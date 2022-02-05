@@ -133,7 +133,7 @@ const BombBlock = styled.div`
 `
 const Home: NextPage = () => {
   // let GameClear = false
-  // let GameOver = false
+  let GameOver = false
 
   // prettier -ignore
   const [board, setBoard] = useState([
@@ -158,44 +158,48 @@ const Home: NextPage = () => {
     return () => clearInterval(interval)
   }, [])
 
-  // 爆弾の生成
+  // console.log(tmpBombs)
   const tmpBombs: { x: number; y: number }[] = []
-  let NumofBombs = 0
-  while (NumofBombs < 10) {
-    const numx = Math.floor(Math.random() * 9)
-    const numy = Math.floor(Math.random() * 9)
-
-    if (!tmpBombs.some((value) => value === { x: numx, y: numy })) {
-      if (!tmpBombs.some((bomb) => bomb.x === numx && bomb.y === numy)) {
-        tmpBombs.push({ x: numx, y: numy })
-        NumofBombs++
-      }
-      /*if (!tmpBombs.some((value) => value === { x: numx, y: numy })) {
-      tmpBombs.push({ x: numx, y: numy })
-      NumofBombs++*/
-
-      // tmpBombs.push({ x: numx, y: numy })
-      // i++
-    }
-  }
-  //-----------
-  console.log(tmpBombs)
   const [bombs, setBombs] = useState(tmpBombs)
+  const NumofBombs = 10 //レベルによって変える
+  const [end, gameOver] = useState(false)
 
   const onClick = (x: number, y: number) => {
     console.log(x, y)
+    // 爆弾を生成する関数
+    const CreateBombs = (Bombs: number) => {
+      const tmpBombs: { x: number; y: number }[] = []
+      let NumofBombs = 0
+      while (NumofBombs < Bombs) {
+        const numx = Math.floor(Math.random() * 9)
+        const numy = Math.floor(Math.random() * 9)
 
+        if (!tmpBombs.some((value) => value === { x: numx, y: numy })) {
+          if (!tmpBombs.some((bomb) => bomb.x === numx && bomb.y === numy)) {
+            tmpBombs.push({ x: numx, y: numy })
+            NumofBombs++
+          }
+          /*if (!tmpBombs.some((value) => value === { x: numx, y: numy })) {
+        tmpBombs.push({ x: numx, y: numy })
+        NumofBombs++*/
+
+          // tmpBombs.push({ x: numx, y: numy })
+          // i++
+        }
+      }
+      return tmpBombs
+    }
     // 周りの爆弾を数える関数
-    const CountBombs = (x: number, y: number) => {
+    const CountBombs = (x: number, y: number, NewBombs: { x: number; y: number }[]) => {
       let ExistBomb = false
       let NumBombs = 0
-      for (let i = 0; i < bombs.length; i++) {
+      for (let i = 0; i < NewBombs.length; i++) {
         for (const n of [x + 1, x, x - 1]) {
           for (const j of [y + 1, y, y - 1]) {
             if (n == x && j == y) {
               continue
             }
-            if (bombs[i].x === n && bombs[i].y === j) {
+            if (NewBombs[i].x === n && NewBombs[i].y === j) {
               ExistBomb = true
               if (ExistBomb) {
                 NumBombs += 1
@@ -221,42 +225,63 @@ const Home: NextPage = () => {
       return CoordinateList
     }
 
+    // ここから実行
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
 
+    if (end) {
+      return
+    }
+
+    // 爆弾が一個ない時に生成する
+    let NewBombs: { x: number; y: number }[] = bombs
+    if (NewBombs.length === 0) {
+      const ListofBombs = CreateBombs(NumofBombs)
+      for (const b of ListofBombs) {
+        NewBombs.push({ x: b.x, y: b.y })
+      }
+      setBombs(NewBombs)
+    }
+
+    // クリックした座標が爆弾だったら existBomb = true
     let existBomb = false
-    let NumBombs = 0
-    NumBombs = CountBombs(x, y)
-    for (let i = 0; i < bombs.length; i++) {
-      if (bombs[i].x === x && bombs[i].y === y) {
+    for (let i = 0; i < NewBombs.length; i++) {
+      if (NewBombs[i].x === x && NewBombs[i].y === y) {
         existBomb = true
+        // newBoard[y][x] = 10
+      }
+    }
+    // 爆弾を踏んだらゲームオーバー
+    if (existBomb) {
+      gameOver(true)
+      for (const bomb of NewBombs) {
+        newBoard[bomb.y][bomb.x] = 10
       }
     }
 
-    /*if (existBomb) {
-      GameOver = true
-      for (const bomb of tmpBombs) {
-        // newBoard[bomb.y][bomb.x] = 10
-      }
-    }*/
+    // 周りの爆弾を数える
+    if (!existBomb) {
+      let NumBombs = 0
+      NumBombs = CountBombs(x, y, NewBombs)
+      newBoard[y][x] = existBomb ? 10 : NumBombs
 
-    // 白連鎖
-    if (NumBombs === 0) {
-      let NewNumBombs = 0
-      const Coordinate = ListofAround(x, y)
-      for (const c of Coordinate) {
-        NewNumBombs = CountBombs(c.x, c.y)
-        newBoard[c.y][c.x] = NewNumBombs
+      // 白連鎖
+      if (NumBombs === 0) {
+        let NewNumBombs = 0
+        const Coordinate = ListofAround(x, y)
+        for (const c of Coordinate) {
+          NewNumBombs = CountBombs(c.x, c.y, NewBombs)
+          newBoard[c.y][c.x] = NewNumBombs
 
-        if (NewNumBombs === 0) {
-          for (const nc of ListofAround(c.x, c.y))
-            if (!Coordinate.some((nb) => nb.x === nc.x && nb.y === nc.y)) {
-              Coordinate.push({ x: nc.x, y: nc.y })
-            }
+          if (NewNumBombs === 0) {
+            for (const nc of ListofAround(c.x, c.y))
+              if (!Coordinate.some((nb) => nb.x === nc.x && nb.y === nc.y)) {
+                Coordinate.push({ x: nc.x, y: nc.y })
+              }
+          }
         }
       }
     }
-
-    newBoard[y][x] = existBomb ? 10 : NumBombs
+    // newBoard[y][x] = existBomb ? 10 : NumBombs
 
     setBoard(newBoard)
   }
@@ -280,7 +305,7 @@ const Home: NextPage = () => {
     <Container>
       <Board>
         <AboveBlock>
-          <NumBombsBlock>0{bombs.length}</NumBombsBlock>
+          <NumBombsBlock>0{NumofBombs}</NumBombsBlock>
           <Face onClick={() => NewGame()}></Face>
           <TimerBlock>{count}</TimerBlock>
         </AboveBlock>
