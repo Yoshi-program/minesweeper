@@ -232,7 +232,7 @@ const Home: NextPage = () => {
     }
 
     // 爆弾が一個ない時に生成する
-    let NewBombs: { x: number; y: number }[] = bombs
+    const NewBombs: { x: number; y: number }[] = bombs
     if (NewBombs.length === 0) {
       const ListofBombs = CreateBombs(NumofBombs)
       for (const b of ListofBombs) {
