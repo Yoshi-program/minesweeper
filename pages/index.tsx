@@ -111,7 +111,7 @@ const Block = styled.div<{ isOpen: boolean; num: number }>`
   line-height: 30px;
   vertical-align: baseline;
   background-image: url(${imageUrl});
-  background-size: 500px;
+  background-size: 505px;
   background-position: ${(props) => (props.num - 1) * -36}px 0px;
   background-repeat: no-repeat;
   border-top: ${(props) => (props.isOpen ? 'solid 1px #272424' : 'solid 3px #d4d4d4')};
@@ -252,14 +252,14 @@ const Home: NextPage = () => {
     for (let i = 0; i < NewBombs.length; i++) {
       if (NewBombs[i].x === x && NewBombs[i].y === y) {
         existBomb = true
-        // newBoard[y][x] = 10
+        // newBoard[y][x] = 12
       }
     }
     // 爆弾を踏んだらゲームオーバー
     if (existBomb) {
       gameOver(true)
       for (const bomb of NewBombs) {
-        newBoard[bomb.y][bomb.x] = 10
+        newBoard[bomb.y][bomb.x] = 12
       }
     }
 
@@ -296,10 +296,16 @@ const Home: NextPage = () => {
     }
     console.log(rest)
     // 全部開けたらクリア
-    if (rest === 81 - NumofBombs - 1) {
-      gameClear(true)
-      // 爆弾のブロックに旗を立てる
+    if (!existBomb) {
+      if (rest === 81 - NumofBombs - 1) {
+        gameClear(true)
+        // 爆弾のブロックに旗を立てる
+        for (const b of NewBombs) {
+          newBoard[b.y][b.x] = 10
+        }
+      }
     }
+
     // newBoard[y][x] = existBomb ? 10 : NumBombs
 
     setBoard(newBoard)
@@ -330,19 +336,19 @@ const Home: NextPage = () => {
         <AboveBlock>
           <NumBombsBlock>0{NumofBombs}</NumBombsBlock>
           <Face face={end ? 21 : clear ? 22 : 23} onClick={() => NewGame()}></Face>
-          <TimerBlock>{count}</TimerBlock>
+          <TimerBlock>{count > 999 ? 999 : ('00' + count).slice(-3)}</TimerBlock>
         </AboveBlock>
         <AroundBlockArea>
           <BlockArea>
             {board.map((row, y) =>
               row.map((num, x) =>
-                num === 10 ? (
+                num === 12 ? (
                   <BombBlock key={`${x}-${y}`}></BombBlock>
                 ) : (
                   <Block
                     key={`${x}-${y}`}
                     isOpen={num < 9}
-                    num={1 <= num && num <= 8 ? num : 20}
+                    num={1 <= num && num <= 10 && num !== 9 ? num : 20}
                     onClick={() => onClick(x, y)}
                   ></Block>
                 )
