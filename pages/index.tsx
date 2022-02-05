@@ -133,7 +133,6 @@ const BombBlock = styled.div`
 `
 const Home: NextPage = () => {
   // let GameClear = false
-  let GameOver = false
 
   // prettier -ignore
   const [board, setBoard] = useState([
@@ -191,7 +190,7 @@ const Home: NextPage = () => {
     }
     // 周りの爆弾を数える関数
     const CountBombs = (x: number, y: number, NewBombs: { x: number; y: number }[]) => {
-      let ExistBomb = false
+      let existBomb = false
       let NumBombs = 0
       for (let i = 0; i < NewBombs.length; i++) {
         for (const n of [x + 1, x, x - 1]) {
@@ -200,11 +199,11 @@ const Home: NextPage = () => {
               continue
             }
             if (NewBombs[i].x === n && NewBombs[i].y === j) {
-              ExistBomb = true
-              if (ExistBomb) {
+              existBomb = true
+              if (existBomb) {
                 NumBombs += 1
               }
-              ExistBomb = false
+              existBomb = false
             }
           }
         }
