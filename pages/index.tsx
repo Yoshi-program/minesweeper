@@ -133,6 +133,11 @@ const BombBlock = styled.div`
 `
 const Home: NextPage = () => {
   // let GameClear = false
+  const tmpBombs: { x: number; y: number }[] = []
+  const [bombs, setBombs] = useState(tmpBombs)
+  const NumofBombs = 10 //レベルによって変える
+  const [end, gameOver] = useState(false)
+  const [start, gameStart] = useState(false)
 
   // prettier -ignore
   const [board, setBoard] = useState([
@@ -150,18 +155,15 @@ const Home: NextPage = () => {
   // タイマー関数
 
   const [count, setCount] = useState(0)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((c) => c + 1)
-    }, 1000)
-    return () => clearInterval(interval)
-  }, [])
 
-  // console.log(tmpBombs)
-  const tmpBombs: { x: number; y: number }[] = []
-  const [bombs, setBombs] = useState(tmpBombs)
-  const NumofBombs = 10 //レベルによって変える
-  const [end, gameOver] = useState(false)
+  useEffect(() => {
+    if (!end && start) {
+      const interval = setInterval(() => {
+        setCount((c) => c + 1)
+      }, 1000)
+      return () => clearInterval(interval)
+    }
+  }, [start, end])
 
   const onClick = (x: number, y: number) => {
     console.log(x, y)
@@ -226,6 +228,7 @@ const Home: NextPage = () => {
 
     // ここから実行
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
+    gameStart(true)
 
     if (end) {
       return
@@ -297,6 +300,7 @@ const Home: NextPage = () => {
       [9, 9, 9, 9, 9, 9, 9, 9, 9],
     ])
     setBombs(tmpBombs)
+    gameOver(false)
     setCount(0)
   }
 
