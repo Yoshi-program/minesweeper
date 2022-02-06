@@ -6,7 +6,7 @@ const imageUrl = 'img/minesweeper.png'
 
 const Container = styled.div`
   height: 800px;
-  background-color: #549cfb;
+  background-color: lightblue;
 `
 const Board = styled.div`
   position: absolute;
@@ -19,10 +19,8 @@ const Board = styled.div`
   background: yellow;
   background-color: #e3e3e3;
   transform: translate(-50%, -50%);
-  border-top: solid 5px #ffffff;
-  border-left: solid 5px #ffffff;
-  border-right: solid 5px #3e3e3e;
-  border-bottom: solid 5px #3e3e3e;
+  border: solid 5px;
+  border-color: #ffffff #3e3e3e #3e3e3e #ffffff;
 `
 const AboveBlock = styled.div`
   position: relative;
@@ -31,10 +29,8 @@ const AboveBlock = styled.div`
   height: 77px;
   margin: auto;
   background-color: #b0b0b0;
-  border-top: solid 5px #3e3e3e;
-  border-left: solid 5px #3e3e3e;
-  border-right: solid 5px #ffffff;
-  border-bottom: solid 5px #ffffff;
+  border: solid 5px;
+  border-color: #3e3e3e #ffffff #ffffff #3e3e3e;
 `
 const NumBombsBlock = styled.div`
   position: absolute;
@@ -47,10 +43,8 @@ const NumBombsBlock = styled.div`
   color: red;
   font-size: 43px;
   text-align: center;
-  border-top: solid 2px #d4d4d4;
-  border-left: solid 2px #d4d4d4;
-  border-right: solid 2px #3e3e3e;
-  border-bottom: solid 2px #3e3e3e;
+  border: solid 2px;
+  border-color: #d4d4d4 #3e3e3e #3e3e3e #d4d4d4;
 `
 const TimerBlock = styled.div`
   position: absolute;
@@ -63,10 +57,8 @@ const TimerBlock = styled.div`
   color: red;
   font-size: 43px;
   text-align: center;
-  border-top: solid 2px #d4d4d4;
-  border-left: solid 2px #d4d4d4;
-  border-right: solid 2px #3e3e3e;
-  border-bottom: solid 2px #3e3e3e;
+  border: solid 2px;
+  border-color: #d4d4d4 #3e3e3e #3e3e3e #d4d4d4;
 `
 
 const Face = styled.div<{ face: number }>`
@@ -91,10 +83,8 @@ const AroundBlockArea = styled.div`
   height: 378px;
   margin: auto;
   background-color: #b0b0b0;
-  border-top: solid 5px #3e3e3e;
-  border-left: solid 5px #3e3e3e;
-  border-right: solid 5px #ffffff;
-  border-bottom: solid 5px #ffffff;
+  border: solid 5px;
+  border-color: #3e3e3e #ffffff #ffffff #3e3e3e;
 `
 const BlockArea = styled.div`
   position: relative;
@@ -114,10 +104,8 @@ const Block = styled.div<{ isOpen: boolean; num: number }>`
   background-size: 505px;
   background-position: ${(props) => (props.num - 1) * -36}px 0px;
   background-repeat: no-repeat;
-  border-top: ${(props) => (props.isOpen ? 'solid 1px #272424' : 'solid 3px #d4d4d4')};
-  border-left: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #d4d4d4')};
-  border-right: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #3e3e3e')};
-  border-bottom: ${(props) => (props.isOpen ? 'solid 1px #707070' : 'solid 3px #3e3e3e')};
+  border: ${(props) => (props.isOpen ? 'solid 1px' : 'solid 4px')};
+  border-color: ${(props) => (props.isOpen ? '#707070' : '#d4d4d4 #3e3e3e #3e3e3e #d4d4d4')};
 `
 const BombBlock = styled.div<{ num: number }>`
   float: left;
@@ -249,7 +237,6 @@ const Home: NextPage = () => {
       NumBombs = CountBombs(x, y, NewBombs)
       newBoard[y][x] = NumBombs
       restBlock((c) => c + 1)
-
       // 白連鎖
       if (NumBombs === 0) {
         let NewNumBombs = 0
