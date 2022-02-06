@@ -1,5 +1,5 @@
 import type { NextPage } from 'next'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 
 const imageUrl = 'img/minesweeper.png'
@@ -310,6 +310,20 @@ const Home: NextPage = () => {
 
     setBoard(newBoard)
   }
+
+  const onRightClick = (x: number, y: number, e: React.MouseEvent) => {
+    const newBoard: number[][] = JSON.parse(JSON.stringify(board))
+    if (end || clear) {
+      return
+    }
+    if (newBoard[y][x] === 9) {
+      newBoard[y][x] = 10
+    } else if (newBoard[y][x] === 10) {
+      newBoard[y][x] = 9
+    }
+    setBoard(newBoard)
+    e.preventDefault()
+  }
   const NewGame = () => {
     setBoard([
       [9, 9, 9, 9, 9, 9, 9, 9, 9],
@@ -350,6 +364,7 @@ const Home: NextPage = () => {
                     isOpen={num < 9}
                     num={1 <= num && num <= 10 && num !== 9 ? num : 20}
                     onClick={() => onClick(x, y)}
+                    onContextMenu={(e) => onRightClick(x, y, e)}
                   ></Block>
                 )
               )
