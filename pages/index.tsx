@@ -5,7 +5,7 @@ import styled from 'styled-components'
 const imageUrl = 'img/minesweeper.png'
 
 const Container = styled.div`
-  height: 800px;
+  height: 100vh;
   background-color: lightblue;
 `
 const Board = styled.div`
@@ -39,10 +39,12 @@ const NumBombsBlock = styled.div`
   width: 100px;
   height: 50px;
   margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #1b1b1b;
   color: red;
   font-size: 43px;
-  text-align: center;
   border: solid 2px;
   border-color: #d4d4d4 #3e3e3e #3e3e3e #d4d4d4;
 `
@@ -53,10 +55,12 @@ const TimerBlock = styled.div`
   width: 100px;
   height: 50px;
   margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-color: #1b1b1b;
   color: red;
   font-size: 43px;
-  text-align: center;
   border: solid 2px;
   border-color: #d4d4d4 #3e3e3e #3e3e3e #d4d4d4;
 `
@@ -124,6 +128,7 @@ const Home: NextPage = () => {
   const tmpBombs: { x: number; y: number }[] = []
   const [bombs, setBombs] = useState(tmpBombs)
   const NumofBombs = 10 //レベルによって変える
+  const [flag, flagCount] = useState(0)
   const [end, gameOver] = useState(false)
   const [clear, gameClear] = useState(false)
   const [start, gameStart] = useState(false)
@@ -222,6 +227,12 @@ const Home: NextPage = () => {
     for (let i = 0; i < NewBombs.length; i++) {
       if (NewBombs[i].x === x && NewBombs[i].y === y) {
         existBomb = true
+        // 最初の一回は爆弾を踏まない処理
+        if (rest === 0 && existBomb) {
+          NewBombs.splice(0)
+          onClick(x, y)
+          return
+        }
         newBoard[y][x] = 13
         gameOver(true)
         for (const bomb of NewBombs) {
@@ -275,8 +286,12 @@ const Home: NextPage = () => {
       return
     }
     if (newBoard[y][x] === 9) {
+      flagCount((c) => c + 1)
       newBoard[y][x] = 10
     } else if (newBoard[y][x] === 10) {
+      flagCount((c) => c - 1)
+      newBoard[y][x] = 11
+    } else if (newBoard[y][x] === 11) {
       newBoard[y][x] = 9
     }
     setBoard(newBoard)
@@ -301,13 +316,16 @@ const Home: NextPage = () => {
     gameClear(false)
     restBlock(0)
     setCount(0)
+    flagCount(0)
   }
 
   return (
     <Container>
       <Board>
         <AboveBlock>
-          <NumBombsBlock>0{NumofBombs}</NumBombsBlock>
+          <NumBombsBlock>
+            {NumofBombs - flag > 999 ? 999 : ('00' + (NumofBombs - flag)).slice(-3)}
+          </NumBombsBlock>
           <Face face={end ? 21 : clear ? 22 : 23} onClick={() => NewGame()}></Face>
           <TimerBlock>{count > 999 ? 999 : ('00' + count).slice(-3)}</TimerBlock>
         </AboveBlock>
@@ -321,7 +339,7 @@ const Home: NextPage = () => {
                   <Block
                     key={`${x}-${y}`}
                     isOpen={num < 9}
-                    num={1 <= num && num <= 10 && num !== 9 ? num : 20}
+                    num={1 <= num && num <= 11 && num !== 9 ? (num === 11 ? 9 : num) : 20}
                     onClick={() => onClick(x, y)}
                     onContextMenu={(e) => onRightClick(x, y, e)}
                   ></Block>
