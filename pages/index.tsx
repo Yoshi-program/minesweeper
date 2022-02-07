@@ -285,6 +285,7 @@ const Home: NextPage = () => {
     if (end || clear) {
       return
     }
+    gameStart(true)
     if (newBoard[y][x] === 9) {
       flagCount((c) => c + 1)
       newBoard[y][x] = 10
