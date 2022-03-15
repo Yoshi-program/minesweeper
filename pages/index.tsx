@@ -128,11 +128,11 @@ const Home: NextPage = () => {
   const tmpBombs: { x: number; y: number }[] = []
   const [bombs, setBombs] = useState(tmpBombs)
   const NumofBombs = 10 //レベルによって変える
-  const [flag, flagCount] = useState(0)
-  const [end, gameOver] = useState(false)
-  const [clear, gameClear] = useState(false)
-  const [start, gameStart] = useState(false)
-  const [rest, restBlock] = useState(0)
+  const [flagCount, setFlagCount] = useState(0)
+  const [gameOver, setGameOver] = useState(false)
+  const [gameClear, setGameClear] = useState(false)
+  const [gameStart, setGameStart] = useState(false)
+  const [restBlock, setRestBlock] = useState(0)
   const [board, setBoard] = useState([
     [9, 9, 9, 9, 9, 9, 9, 9, 9],
     [9, 9, 9, 9, 9, 9, 9, 9, 9],
@@ -148,13 +148,13 @@ const Home: NextPage = () => {
   // タイマー関数
   const [count, setCount] = useState(0)
   useEffect(() => {
-    if (!end && start && !clear) {
+    if (!gameOver && gameStart && !gameClear) {
       const interval = setInterval(() => {
         setCount((c) => c + 1)
       }, 1000)
       return () => clearInterval(interval)
     }
-  }, [start, end, clear])
+  }, [gameStart, gameOver, gameClear])
   // クリック時の処理
   const onClick = (x: number, y: number) => {
     // 爆弾を生成する関数
@@ -209,8 +209,8 @@ const Home: NextPage = () => {
     }
     // ここから実行
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
-    gameStart(true)
-    if (end || clear || newBoard[y][x] !== 9) {
+    setGameStart(true)
+    if (gameOver || gameClear || newBoard[y][x] !== 9) {
       return
     }
     // 爆弾が一個ない時に生成する
@@ -228,13 +228,13 @@ const Home: NextPage = () => {
       if (NewBombs[i].x === x && NewBombs[i].y === y) {
         existBomb = true
         // 最初の一回は爆弾を踏まない処理
-        if (rest === 0 && existBomb) {
+        if (restBlock === 0 && existBomb) {
           NewBombs.splice(0)
           onClick(x, y)
           return
         }
         newBoard[y][x] = 13
-        gameOver(true)
+        setGameOver(true)
         for (const bomb of NewBombs) {
           if (!(newBoard[bomb.y][bomb.x] === 13)) {
             newBoard[bomb.y][bomb.x] = 12
@@ -247,7 +247,7 @@ const Home: NextPage = () => {
       let NumBombs = 0
       NumBombs = CountBombs(x, y, NewBombs)
       newBoard[y][x] = NumBombs
-      restBlock((c) => c + 1)
+      setRestBlock((c) => c + 1)
       // 白連鎖
       if (NumBombs === 0) {
         let NewNumBombs = 0
@@ -256,7 +256,7 @@ const Home: NextPage = () => {
           NewNumBombs = CountBombs(c.x, c.y, NewBombs)
           if (newBoard[c.y][c.x] === 9) {
             newBoard[c.y][c.x] = NewNumBombs
-            restBlock((c) => c + 1)
+            setRestBlock((c) => c + 1)
           }
           if (NewNumBombs === 0) {
             for (const nc of ListofAround(c.x, c.y))
@@ -269,8 +269,8 @@ const Home: NextPage = () => {
     }
     // 全部開けたらクリア
     if (!existBomb) {
-      if (rest === 81 - NumofBombs - 1) {
-        gameClear(true)
+      if (restBlock === 81 - NumofBombs - 1) {
+        setGameClear(true)
         // 爆弾のブロックに旗を立てる
         for (const b of NewBombs) {
           newBoard[b.y][b.x] = 10
@@ -282,15 +282,15 @@ const Home: NextPage = () => {
   //右クリック時の処理
   const onRightClick = (x: number, y: number, e: React.MouseEvent) => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
-    if (end || clear) {
+    if (gameOver || gameClear) {
       return
     }
-    gameStart(true)
+    setGameStart(true)
     if (newBoard[y][x] === 9) {
-      flagCount((c) => c + 1)
+      setFlagCount((c) => c + 1)
       newBoard[y][x] = 10
     } else if (newBoard[y][x] === 10) {
-      flagCount((c) => c - 1)
+      setFlagCount((c) => c - 1)
       newBoard[y][x] = 11
     } else if (newBoard[y][x] === 11) {
       newBoard[y][x] = 9
@@ -312,12 +312,12 @@ const Home: NextPage = () => {
       [9, 9, 9, 9, 9, 9, 9, 9, 9],
     ])
     setBombs(tmpBombs)
-    gameStart(false)
-    gameOver(false)
-    gameClear(false)
-    restBlock(0)
+    setGameStart(false)
+    setGameOver(false)
+    setGameClear(false)
+    setRestBlock(0)
     setCount(0)
-    flagCount(0)
+    setFlagCount(0)
   }
 
   return (
@@ -325,9 +325,9 @@ const Home: NextPage = () => {
       <Board>
         <AboveBlock>
           <NumBombsBlock>
-            {NumofBombs - flag > 999 ? 999 : ('00' + (NumofBombs - flag)).slice(-3)}
+            {NumofBombs - flagCount > 999 ? 999 : ('00' + (NumofBombs - flagCount)).slice(-3)}
           </NumBombsBlock>
-          <Face face={end ? 21 : clear ? 22 : 23} onClick={() => NewGame()}></Face>
+          <Face face={gameOver ? 21 : gameClear ? 22 : 23} onClick={() => NewGame()}></Face>
           <TimerBlock>{count > 999 ? 999 : ('00' + count).slice(-3)}</TimerBlock>
         </AboveBlock>
         <AroundBlockArea>
