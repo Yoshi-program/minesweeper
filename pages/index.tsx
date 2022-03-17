@@ -248,7 +248,7 @@ const Home: NextPage = () => {
       NumBombs = CountBombs(x, y, NewBombs)
       newBoard[y][x] = NumBombs
       setRestBlock((c) => c + 1)
-      // 白連鎖
+      // 白マス連鎖
       if (NumBombs === 0) {
         let NewNumBombs = 0
         const Coordinate = ListofAround(x, y)
