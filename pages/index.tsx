@@ -48,23 +48,9 @@ const NumBombsBlock = styled.div`
   border: solid 2px;
   border-color: #d4d4d4 #3e3e3e #3e3e3e #d4d4d4;
 `
-const TimerBlock = styled.div`
-  position: absolute;
-  top: 8px;
+const TimerBlock = styled(NumBombsBlock)`
   right: 25px;
-  width: 100px;
-  height: 50px;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #1b1b1b;
-  color: red;
-  font-size: 43px;
-  border: solid 2px;
-  border-color: #d4d4d4 #3e3e3e #3e3e3e #d4d4d4;
 `
-
 const Face = styled.div<{ face: number }>`
   position: relative;
   top: 8px;
@@ -155,6 +141,7 @@ const Home: NextPage = () => {
       return () => clearInterval(interval)
     }
   }, [gameStart, gameOver, gameClear])
+
   // クリック時の処理
   const onClick = (x: number, y: number) => {
     // 爆弾を生成する関数
@@ -173,6 +160,7 @@ const Home: NextPage = () => {
       }
       return tmpBombs
     }
+
     // 周りの爆弾を数える関数
     const CountBombs = (x: number, y: number, NewBombs: { x: number; y: number }[]) => {
       let existBomb = false
@@ -180,14 +168,10 @@ const Home: NextPage = () => {
       for (let i = 0; i < NewBombs.length; i++) {
         for (const n of [x + 1, x, x - 1]) {
           for (const j of [y + 1, y, y - 1]) {
-            if (n == x && j == y) {
-              continue
-            }
+            if (n == x && j == y) continue
             if (NewBombs[i].x === n && NewBombs[i].y === j) {
               existBomb = true
-              if (existBomb) {
-                NumBombs += 1
-              }
+              if (existBomb) NumBombs += 1
               existBomb = false
             }
           }
@@ -195,6 +179,7 @@ const Home: NextPage = () => {
       }
       return NumBombs
     }
+
     // 白連鎖のための周りの座標を保存し返す関数
     const ListofAround = (x: number, y: number) => {
       const CoordinateList = []
@@ -207,12 +192,12 @@ const Home: NextPage = () => {
       }
       return CoordinateList
     }
+
     // ここから実行
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
     setGameStart(true)
-    if (gameOver || gameClear || newBoard[y][x] !== 9) {
-      return
-    }
+    if (gameOver || gameClear || newBoard[y][x] !== 9) return
+
     // 爆弾が一個ない時に生成する
     const NewBombs: { x: number; y: number }[] = bombs
     if (NewBombs.length === 0) {
@@ -222,11 +207,13 @@ const Home: NextPage = () => {
       }
       setBombs(NewBombs)
     }
+
     // 敗北処理
     let existBomb = false
     for (let i = 0; i < NewBombs.length; i++) {
       if (NewBombs[i].x === x && NewBombs[i].y === y) {
         existBomb = true
+
         // 最初の一回は爆弾を踏まない処理
         if (restBlock === 0 && existBomb) {
           NewBombs.splice(0)
@@ -242,12 +229,14 @@ const Home: NextPage = () => {
         }
       }
     }
+
     // 周りの爆弾を数える
     if (!existBomb) {
       let NumBombs = 0
       NumBombs = CountBombs(x, y, NewBombs)
       newBoard[y][x] = NumBombs
       setRestBlock((c) => c + 1)
+
       // 白マス連鎖
       if (NumBombs === 0) {
         let NewNumBombs = 0
@@ -267,24 +256,23 @@ const Home: NextPage = () => {
         }
       }
     }
+
     // 全部開けたらクリア
     if (!existBomb) {
       if (restBlock === 81 - NumofBombs - 1) {
         setGameClear(true)
+
         // 爆弾のブロックに旗を立てる
-        for (const b of NewBombs) {
-          newBoard[b.y][b.x] = 10
-        }
+        for (const b of NewBombs) newBoard[b.y][b.x] = 10
       }
     }
     setBoard(newBoard)
   }
+
   //右クリック時の処理
   const onRightClick = (x: number, y: number, e: React.MouseEvent) => {
     const newBoard: number[][] = JSON.parse(JSON.stringify(board))
-    if (gameOver || gameClear) {
-      return
-    }
+    if (gameOver || gameClear) return
     setGameStart(true)
     if (newBoard[y][x] === 9) {
       setFlagCount((c) => c + 1)
@@ -298,6 +286,7 @@ const Home: NextPage = () => {
     setBoard(newBoard)
     e.preventDefault()
   }
+
   // 中央上の顔を押すとニューゲーム
   const NewGame = () => {
     setBoard([
