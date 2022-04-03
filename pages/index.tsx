@@ -64,6 +64,9 @@ const Face = styled.div<{ face: number }>`
     props.face === 21 ? '39px 0px;' : props.face === 22 ? '76px 0px;' : '113px 0px;'};
   border: solid 5px;
   border-color: #d4d4d4 #3e3e3e #3e3e3e #d4d4d4;
+  &:active {
+    border-color: #3e3e3e #d4d4d4 #d4d4d4 #3e3e3e;
+  }
 `
 const AroundBlockArea = styled.div`
   position: absolute;
@@ -82,9 +85,8 @@ const BlockArea = styled.div`
   width: 369px;
   height: 369px;
   margin: auto;
-  background-color: #b0b0b0;
 `
-const Block = styled.div<{ isOpen: boolean; num: number }>`
+const Block = styled.button<{ isOpen: boolean; num: number; gameOver: boolean }>`
   float: left;
   width: 41px;
   height: 41px;
@@ -96,6 +98,13 @@ const Block = styled.div<{ isOpen: boolean; num: number }>`
   background-repeat: no-repeat;
   border: ${(props) => (props.isOpen ? 'solid 1px' : 'solid 4px')};
   border-color: ${(props) => (props.isOpen ? '#707070' : '#d4d4d4 #3e3e3e #3e3e3e #d4d4d4')};
+  background-color: #b0b0b0;
+  &:active {
+    background-position: ${(props) => (props.num - 1) * -35.5}px 0px;
+    border: ${(props) => !props.isOpen && !props.gameOver && 'solid 1px'};
+    border-color: ${(props) =>
+      props.gameOver && !props.isOpen ? '#d4d4d4 #3e3e3e #3e3e3e #d4d4d4' : '#707070'};
+  }
 `
 const BombBlock = styled.div<{ num: number }>`
   float: left;
@@ -332,6 +341,7 @@ const Home: NextPage = () => {
                     num={1 <= num && num <= 11 && num !== 9 ? (num === 11 ? 9 : num) : 20}
                     onClick={() => onClick(x, y)}
                     onContextMenu={(e) => onRightClick(x, y, e)}
+                    gameOver={gameOver}
                   ></Block>
                 )
               )
